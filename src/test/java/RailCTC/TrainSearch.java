@@ -1,6 +1,7 @@
 package RailCTC;
 
 import java.time.Duration;
+import java.util.Iterator;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -10,64 +11,86 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import RailCTC.PageObjects.LandingPage;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class TrainSearch {
      
 	public WebDriver driver;
-	@Test
-	public void TrainSearch() throws InterruptedException {
+	@Test(dataProvider="getData")
+	public void TrainSearch(String OPl,String DesPl,String OflName,String desflName,String mnth,String dte) throws InterruptedException {
 		
 		WebDriverManager.chromedriver().setup();
 		driver=new ChromeDriver();
 		driver.get("https://www.irctc.co.in/nget/train-search");
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3000));
-		driver.findElement(By.cssSelector(".ng-tns-c57-8.ui-inputtext.ui-widget.ui-state-default.ui-corner-all.ui-autocomplete-input.ng-star-inserted")).sendKeys("SBC");
+		LandingPage lpage=new LandingPage(driver);
+		lpage.updatefromPlace(OPl,OflName);
+		//driver.findElement(By.cssSelector(".ng-tns-c57-8.ui-inputtext.ui-widget.ui-state-default.ui-corner-all.ui-autocomplete-input.ng-star-inserted")).sendKeys(OPl);
 		
-		WebElement originplace=driver.findElement(By.xpath("(//span[text()=' KSR BENGALURU - SBC '])[1]"));
-		WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(3000));
-		//wait.until(ExpectedConditions.)
-		wait.until(ExpectedConditions.visibilityOf(originplace));
-		originplace.click();
-		driver.findElement(By.xpath("(//input[@aria-autocomplete='list'])[2]")).sendKeys("GPB");
-		WebElement destPlace=driver.findElement(By.xpath("(//span[text()=' GHATPRABHA - GPB '])[1]"));
-		wait.until(ExpectedConditions.visibilityOf(destPlace));
-		destPlace.click();
-		Thread.sleep(3000);
-		driver.findElement(By.cssSelector(".ng-tns-c58-54.ui-inputtext.ui-widget.ui-state-default.ui-corner-all.ng-star-inserted")).click();
-		WebElement monthWeb=driver.findElement(By.xpath("//span[@class='ui-datepicker-month ng-tns-c58-54 ng-star-inserted']"));
+		//WebElement originplace=driver.findElement(By.xpath("(//span[text()=' "+OflName+" '])[1]"));
+		
+		//WebDriverWait wait=new WebDriverWait(driver, Duration.ofSeconds(3000));
+		
+		//wait.until(ExpectedConditions.visibilityOf(originplace)).click();
+		
+		//driver.findElement(By.xpath("(//input[@aria-autocomplete='list'])[2]")).sendKeys(DesPl);
+		lpage.updateToPlace(DesPl,desflName);
+		//WebElement destPlace=driver.findElement(By.xpath("(//span[text()=' "+desflName+" '])[1]"));
+		//wait.until(ExpectedConditions.visibilityOf(destPlace)).click();
+		
+		driver.findElement(By.xpath("(//input[@type='text'])[3]")).click();
+		
+		WebElement monthWeb=driver.findElement(By.cssSelector(".ui-datepicker-month.ng-tns-c58-10.ng-star-inserted"));
 		String month=monthWeb.getText();
-		while(!(month =="April")) {
-			driver.findElement(By.xpath("//span[@class='ui-datepicker-next-icon pi pi-chevron-right ng-tns-c58-54']")).click();
+		String year=driver.findElement(By.xpath("//span[text()='2025']")).getText();
+		
+		while(!month.equalsIgnoreCase(mnth)) {
+			driver.findElement(By.cssSelector(".ui-datepicker-next-icon.pi.pi-chevron-right.ng-tns-c58-10")).click();
+			month=driver.findElement(By.cssSelector(".ui-datepicker-month.ng-tns-c58-10.ng-star-inserted")).getText();
+			//month=monthWeb.getText();
+		} 
+		
+		driver.findElement(By.xpath("//a[text()='"+dte+"']")).click();
+		driver.findElement(By.xpath("(//div[@aria-haspopup='listbox'])[1]")).click();
+		
+		List<WebElement> travelclass=driver.findElements(By.xpath("//p-dropdownitem[@class='ng-tns-c65-11 ng-star-inserted']"));
+		
+		Iterator<WebElement> it=travelclass.iterator();
+		
+		
+		for(WebElement selectclass:travelclass) {
+			
+			if(selectclass.getText().contains("Sleeper (SL)")) {
+				selectclass.click();
+			}
+			
 		}
 		
-		driver.findElement(By.xpath("//a[text()='9']")).click();
-		wait.pollingEvery(Duration.ofSeconds(1000));
+		driver.findElement(By.xpath("(//div[@aria-haspopup='listbox'])[2]")).click();
+		driver.findElement(By.xpath("//span[normalize-space()='LOWER BERTH/SR.CITIZEN']")).click();
 		
-		//JavascriptExecutor js=(JavascriptExecutor)driver;
-		//js.executeScript(null, null)
-		//Thread.sleep(2000);
-		/*List<WebElement> startplaces=driver.findElements(By.xpath("//span[@class='ng-star-inserted']"));
-		for(WebElement startcity:startplaces) {
-			//System.out.println(startcity.getText());
-			if(startcity.getText().contains("KSR")) {
-				startcity.click();
-			}
-				
-		}
-		//Thread.sleep(3000);
-		driver.findElement(By.xpath("//input[contains(@class,'c57-9')][2]")).sendKeys("GPB");
-		List<WebElement> destplaces=driver.findElements(By.xpath("//span[@class='ng-star-inserted']"));
-		for(WebElement destination:startplaces) {
-			//System.out.println(startcity.getText());
-			if(destination.getText().contains("GHAT")) {
-				destination.click();
-			}
-				
-		} */
-		//driver.switchTo().alert().
+		driver.findElement(By.cssSelector(".ui-button-text.ui-clickable")).click();
+		
+		JavascriptExecutor js=(JavascriptExecutor) driver;
+		
+		driver.findElement(By.xpath("(//button[@class='search_btn train_Search'])[1]")).click();
+		String text=driver.findElement(By.xpath("(//span[contains(text(),' Results for')])[1]")).getText();
+		driver.close();
+		
+	}
+	
+	@DataProvider
+	public Object[][] getData() {
+		
+		return new Object[][] {{"SBC","GPB","KSR BENGALURU - SBC","GHATPRABHA - GPB","April","9"},{"SBC","BGM","KSR BENGALURU - SBC","BELAGAVI - BGM","May","10"}};
+		
 	}
 }
+
+
