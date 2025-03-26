@@ -24,6 +24,9 @@ public class LandingPage extends AbstractComponents {
 	  @FindBy(css=".ng-tns-c57-8.ui-inputtext.ui-widget.ui-state-default.ui-corner-all.ui-autocomplete-input.ng-star-inserted")
       WebElement startPlace;
 	  
+	  @FindBy(xpath="(//label[contains(text(),'PNR STATUS')])[1]")
+	  WebElement pnrstatus;
+	  
 	 // @FindBy(xpath="(//span[text()=' "+OflName+" '])[1]")
 	  //WebElement originPlace;
 	  
@@ -142,6 +145,14 @@ public class LandingPage extends AbstractComponents {
 	  public void clickSearchButton() {
 		  searchButton.click();
 	  }
+	  
+	  public PNREnquiryPage pnrstatuscheck() {
+		  pnrstatus.click();
+		  PNREnquiryPage pnren=new PNREnquiryPage(driver);
+		  return pnren;
+		  
+	  }
+	  
 
 	public void goTo() {
 		// TODO Auto-generated method stub

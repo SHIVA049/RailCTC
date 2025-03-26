@@ -3,11 +3,12 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="RailCTC.SearchAvaialableTrainsTest">
+      <class name="RailCTC.PNRStatusCheckTest">
         <methods>
-          <include name="TrainSearch" invocation-numbers="0"/>
+          <include name="PNRStatusCheck" invocation-numbers="0"/>
+          <include name="tearDown"/>
         </methods>
-      </class> <!-- RailCTC.SearchAvaialableTrainsTest -->
+      </class> <!-- RailCTC.PNRStatusCheckTest -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->
